@@ -24,6 +24,12 @@ public class ClickRainController : MonoBehaviour
     private float interval = 0f;
     private bool isWaitingDelay = false;
 
+    private Camera m_camera;
+    private void Start()
+    {
+        //m_camera = Camera.main;
+        //m_camera = transform.parent.parent.GetComponent<Camera>();
+    }
     public bool IsPlaying
     {
         get
@@ -80,6 +86,7 @@ public class ClickRainController : MonoBehaviour
     public void Play()
     {
         StartCoroutine(PlayDelay(Variables.Delay));
+        
     }
 
     IEnumerator PlayDelay(float delay)
@@ -98,11 +105,11 @@ public class ClickRainController : MonoBehaviour
             yield break;
         }
 
-        for (int i = 0; i < drawers.Count; i++)
-        {
-            InitializeDrawer(drawers[i]);
-            drawers[i].currentState = DrawState.Disabled;
-        }
+        //for (int i = 0; i < drawers.Count; i++)
+        //{
+        //    InitializeDrawer(drawers[i]);
+        //    drawers[i].currentState = DrawState.Disabled;
+        //}
 
         isOneShot = Variables.PlayOnce;
         if (isOneShot)
@@ -125,22 +132,27 @@ public class ClickRainController : MonoBehaviour
 
         CheckSpawnNum();
 
-        if (NoMoreRain)
+        if(Input.GetMouseButtonUp(0) == true)
         {
-            timeElapsed = 0f;
+            Spawn();
         }
-        else if (isOneShot)
-        {
-            oneShotTimeleft -= Time.deltaTime;
-            if (oneShotTimeleft > 0f)
-            {
-                CheckSpawnTime();
-            }
-        }
-        else if (!isWaitingDelay)
-        {
-            CheckSpawnTime();
-        }
+
+        //if (NoMoreRain)
+        //{
+        //    timeElapsed = 0f;
+        //}
+        //else if (isOneShot)
+        //{
+        //    oneShotTimeleft -= Time.deltaTime;
+        //    if (oneShotTimeleft > 0f)
+        //    {
+        //        CheckSpawnTime();
+        //    }
+        //}
+        //else if (!isWaitingDelay)
+        //{
+        //    CheckSpawnTime();
+        //}
 
         for (int i = 0; i < drawers.Count(); i++)
         {
@@ -151,37 +163,37 @@ public class ClickRainController : MonoBehaviour
 
     private void CheckSpawnNum()
     {
-        int diff = Variables.MaxRainSpawnCount - drawers.Count();
+        //int diff = Variables.MaxRainSpawnCount - drawers.Count();
 
-        // MaxRainSpawnCount was increased
-        if (diff > 0)
-        {
-            for (int i = 0; i < diff; i++)
-            {
-                ClickRainDrawerContainer container = new ClickRainDrawerContainer("Click RainDrawer " + (drawers.Count() + i), this.transform);
-                container.currentState = DrawState.Disabled;
-                drawers.Add(container);
-            }
-        }
+        //// MaxRainSpawnCount was increased
+        //if (diff > 0)
+        //{
+        //    for (int i = 0; i < diff; i++)
+        //    {
+        //        ClickRainDrawerContainer container = new ClickRainDrawerContainer("Click RainDrawer " + (drawers.Count() + i), this.transform);
+        //        container.currentState = DrawState.Disabled;
+        //        drawers.Add(container);
+        //    }
+        //}
 
-        // MaxRainSpawnCount was decreased
-        if (diff < 0)
-        {
-            int rmcnt = -diff;
-            List<ClickRainDrawerContainer> removeList = drawers.FindAll(x => x.currentState != DrawState.Playing).Take(rmcnt).ToList();
-            if (removeList.Count() < rmcnt)
-            {
-                removeList.AddRange(drawers.FindAll(x => x.currentState == DrawState.Playing).Take(rmcnt - removeList.Count()));
-            }
+        //// MaxRainSpawnCount was decreased
+        //if (diff < 0)
+        //{
+        //    int rmcnt = -diff;
+        //    List<ClickRainDrawerContainer> removeList = drawers.FindAll(x => x.currentState != DrawState.Playing).Take(rmcnt).ToList();
+        //    if (removeList.Count() < rmcnt)
+        //    {
+        //        removeList.AddRange(drawers.FindAll(x => x.currentState == DrawState.Playing).Take(rmcnt - removeList.Count()));
+        //    }
 
-            foreach (var rem in removeList)
-            {
-                rem.Drawer.Hide();
-                DestroyImmediate(rem.Drawer.gameObject);
-            }
+        //    foreach (var rem in removeList)
+        //    {
+        //        rem.Drawer.Hide();
+        //        DestroyImmediate(rem.Drawer.gameObject);
+        //    }
 
-            drawers.RemoveAll(x => x.Drawer == null);
-        }
+        //    drawers.RemoveAll(x => x.Drawer == null);
+        //}
     }
 
 
@@ -215,6 +227,7 @@ public class ClickRainController : MonoBehaviour
             return;
         }
 
+        //InitializeDrawer(spawnRain,new Vector2(0,0));
         InitializeDrawer(spawnRain);
         spawnRain.currentState = DrawState.Playing;
     }
@@ -230,7 +243,15 @@ public class ClickRainController : MonoBehaviour
     {
         dc.TimeElapsed = 0f;
         dc.lifetime = RainDropTools.Random(Variables.LifetimeMin, Variables.LifetimeMax);
-        dc.transform.localPosition = RainDropTools.GetSpawnLocalPos(this.transform, camera, 0f, Variables.SpawnOffsetY);
+        //dc.transform.localPosition = RainDropTools.GetSpawnLocalPos(this.transform, camera, 0f, Variables.SpawnOffsetY);
+        Vector3 vecPos = RainDropTools.GetSpawnLocalPos(this.transform, camera, 0f, Variables.SpawnOffsetY);
+
+        Vector3 vecMouseWorld = camera.ScreenToWorldPoint(Input.mousePosition);
+        vecMouseWorld = new Vector3(vecMouseWorld.x, vecMouseWorld.y + 2000, 0);
+        Debug.Log(string.Format("mouse [{0}], world [{1}] vecPos[{2}]", Input.mousePosition, vecMouseWorld, vecPos));
+        //Vector2 vecPos = new Vector2(vecMouseWorld.x - transform.position.x, vecMouseWorld.y - transform.position.y);
+
+        dc.transform.localPosition = vecMouseWorld;
         dc.startPos = dc.transform.localPosition;
         dc.startSize = new Vector3(
             RainDropTools.Random(Variables.SizeMinX, Variables.SizeMaxX),

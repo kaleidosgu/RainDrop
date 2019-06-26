@@ -275,6 +275,11 @@ public class RainDropTools : MonoBehaviour {
         return localPos;
     }
 
+    //public static Vector3 GetClickLocalPos(Transform parent, Camera cam, float offsetX, float offsetY, Vector2 vecScreen)
+    //{
+    //    Vector2 camSize = GetCameraOrthographicSize(cam);
+    //}
+
 
     /// <summary>
     /// Get the g-forced screen movement

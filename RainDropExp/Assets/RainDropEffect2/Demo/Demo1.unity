@@ -2497,7 +2497,7 @@ MonoBehaviour:
     AutoRotate: 1
     Duration: 1
     Delay: 0
-    MaxRainSpawnCount: 1000
+    MaxRainSpawnCount: 50
     SpawnOffsetY: 0.05
     LifetimeMin: 4.51
     LifetimeMax: 4.55
