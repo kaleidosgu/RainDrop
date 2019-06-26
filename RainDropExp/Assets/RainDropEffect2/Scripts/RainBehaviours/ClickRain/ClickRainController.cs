@@ -247,7 +247,7 @@ public class ClickRainController : MonoBehaviour
         Vector3 vecPos = RainDropTools.GetSpawnLocalPos(this.transform, camera, 0f, Variables.SpawnOffsetY);
 
         Vector3 vecMouseWorld = camera.ScreenToWorldPoint(Input.mousePosition);
-        vecMouseWorld = new Vector3(vecMouseWorld.x, vecMouseWorld.y + 2000, 0);
+        vecMouseWorld = new Vector3(vecMouseWorld.x, vecMouseWorld.y - transform.position.y, 0);
         Debug.Log(string.Format("mouse [{0}], world [{1}] vecPos[{2}]", Input.mousePosition, vecMouseWorld, vecPos));
         //Vector2 vecPos = new Vector2(vecMouseWorld.x - transform.position.x, vecMouseWorld.y - transform.position.y);
 
