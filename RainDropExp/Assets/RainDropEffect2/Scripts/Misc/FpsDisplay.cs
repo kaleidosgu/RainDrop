@@ -23,16 +23,16 @@ public class FpsDisplay : MonoBehaviour
 
     void OnGUI()
     {
-        int w = Screen.width;
-        int h = Screen.height;
+        //int w = Screen.width;
+        //int h = Screen.height;
 
-        GUIStyle style = new GUIStyle();
+        //GUIStyle style = new GUIStyle();
 
-        Rect rect = new Rect(0, h - h / 10, w, h / 10);
-        style.alignment = TextAnchor.UpperLeft;
-        style.fontSize = h / 10;
-        style.normal.textColor = Color.white;
-        string text = string.Format("FPS:{0}", fps);
-        GUI.Label(rect, text, style);
+        //Rect rect = new Rect(0, h - h / 10, w, h / 10);
+        //style.alignment = TextAnchor.UpperLeft;
+        //style.fontSize = h / 10;
+        //style.normal.textColor = Color.white;
+        //string text = string.Format("FPS:{0}", fps);
+        //GUI.Label(rect, text, style);
     }
 }

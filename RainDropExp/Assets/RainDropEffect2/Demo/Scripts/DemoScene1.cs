@@ -60,16 +60,16 @@ public class DemoScene1 : MonoBehaviour {
 
     private void OnGUI()
     {
-        int index = 0;
-        foreach (var con in rainControllers)
-        {
-            if (GuiButton(string.Format("Rain[{0}]", index)))
-            {
-                StopAll();
-                con.Play();
-            }
-            index++;
-        }
+        //int index = 0;
+        //foreach (var con in rainControllers)
+        //{
+        //    if (GuiButton(string.Format("Rain[{0}]", index)))
+        //    {
+        //        StopAll();
+        //        con.Play();
+        //    }
+        //    index++;
+        //}
     }
 
 
