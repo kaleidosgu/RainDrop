@@ -24,6 +24,7 @@ public class ClickRainController : MonoBehaviour
     private float interval = 0f;
     private bool isWaitingDelay = false;
 
+    private float m_fUpTime;
     private Camera m_camera;
     private void Start()
     {
@@ -130,10 +131,15 @@ public class ClickRainController : MonoBehaviour
             return;
         }
         
+        if( Input.GetMouseButtonDown(0) == true)
+        {
+            m_fUpTime = Time.time;
+        }
 
         if(Input.GetMouseButtonUp(0) == true)
         {
-            Spawn();
+            float fTimeDiff = Time.time - m_fUpTime;
+            Spawn(fTimeDiff);
         }
 
         for (int i = 0; i < drawers.Count(); i++)
@@ -142,7 +148,7 @@ public class ClickRainController : MonoBehaviour
         }
     }
     
-    private void Spawn()
+    private void Spawn(float fTimeFromDownToUp)
     {
         var spawnRain = drawers.Find(x => x.currentState == DrawState.Disabled);
         if (spawnRain == null)
@@ -152,7 +158,16 @@ public class ClickRainController : MonoBehaviour
         }
 
         //InitializeDrawer(spawnRain,new Vector2(0,0));
-        InitializeDrawer(spawnRain);
+        float fTimeRate = 0.0f;
+        if(Variables.TimeOfMaxSizeRainDrop > 0)
+        {
+            fTimeRate = fTimeFromDownToUp / Variables.TimeOfMaxSizeRainDrop;
+        }
+        if(fTimeRate > 1.0f)
+        {
+            fTimeRate = 1.0f;
+        }
+        InitializeDrawer(spawnRain, fTimeRate);
         spawnRain.currentState = DrawState.Playing;
     }
 
@@ -163,7 +178,7 @@ public class ClickRainController : MonoBehaviour
     }
 
 
-    private void InitializeDrawer(ClickRainDrawerContainer dc)
+    private void InitializeDrawer(ClickRainDrawerContainer dc,float fTimeRate)
     {
         dc.TimeElapsed = 0f;
         dc.lifetime = RainDropTools.Random(Variables.LifetimeMin, Variables.LifetimeMax);
@@ -174,12 +189,18 @@ public class ClickRainController : MonoBehaviour
 
         dc.transform.localPosition = vecMouseWorld;
         dc.startPos = dc.transform.localPosition;
-        dc.startSize = new Vector3(
-            RainDropTools.Random(Variables.SizeMinX, Variables.SizeMaxX),
-            RainDropTools.Random(Variables.SizeMinY, Variables.SizeMaxY),
-            1f
-        );
-		dc.transform.localEulerAngles += Vector3.forward * (Variables.AutoRotate ? UnityEngine.Random.Range(0f, 179.9f) : 0f);
+        float fSizeX = Variables.SizeMaxX * fTimeRate;
+        float fSizeY = Variables.SizeMaxY * fTimeRate;
+        if (fSizeX < Variables.SizeMinX)
+        {
+            fSizeX = Variables.SizeMinX;
+        }
+        if( fSizeY < Variables.SizeMinY)
+        {
+            fSizeY = Variables.SizeMinY;
+        }
+        dc.startSize = new Vector3(fSizeX, fSizeY, 1f);
+        dc.transform.localEulerAngles += Vector3.forward * (Variables.AutoRotate ? UnityEngine.Random.Range(0f, 179.9f) : 0f);
         dc.Drawer.NormalMap = Variables.NormalMap;
         dc.Drawer.ReliefTexture = Variables.OverlayTexture;
         dc.Drawer.Darkness = Variables.Darkness;
@@ -199,7 +220,8 @@ public class ClickRainController : MonoBehaviour
             Variables.OverlayColor.b,
             Variables.OverlayColor.a * Variables.AlphaOverLifetime.Evaluate(progress) * Alpha
         );
-        dc.Drawer.DistortionStrength = Variables.DistortionValue * Variables.DistortionOverLifetime.Evaluate(progress) * Alpha;
+        //dc.Drawer.DistortionStrength = Variables.DistortionValue * Variables.DistortionOverLifetime.Evaluate(progress) * Alpha;
+        dc.Drawer.DistortionStrength = Variables.DistortionValue * 0.5f * Alpha;
         dc.Drawer.ReliefValue = Variables.ReliefValue * Variables.ReliefOverLifetime.Evaluate(progress) * Alpha;
         dc.Drawer.Blur = Variables.Blur * Variables.BlurOverLifetime.Evaluate(progress) * Alpha;
         dc.Drawer.Darkness = Variables.Darkness * Alpha;
@@ -208,7 +230,14 @@ public class ClickRainController : MonoBehaviour
         //dc.transform.localPosition = dc.startPos + Vector3.up * Variables.PosYOverLifetime.Evaluate(progress);
         Vector3 gforced = RainDropTools.GetGForcedScreenMovement(this.camera.transform, this.GForceVector);
         gforced = gforced.normalized;
-        dc.transform.localPosition += new Vector3(-gforced.x, -gforced.y, 0f) * 0.01f * Variables.PosYOverLifetime.Evaluate(progress);
+        float fSizeRate = dc.startSize.x / Variables.SizeMaxX;
+        if( fSizeRate >= Variables.GForceEffectSizeRate )
+        {
+            float fOverLifeValue = Variables.PosYOverLifetime.Evaluate(progress);
+            //Debug.Log(string.Format("fOverLifeValue = [{0}]", fOverLifeValue));
+            //dc.transform.localPosition += new Vector3(-gforced.x * fSizeRate, -gforced.y * fSizeRate, 0f) * 0.01f * fOverLifeValue;
+            dc.transform.localPosition += new Vector3(-gforced.x * fSizeRate, -gforced.y * fSizeRate, 0f) * -0.01f ;
+        }
         dc.transform.localPosition += progress * new Vector3(GlobalWind.x, GlobalWind.y, 0f);
         dc.transform.localPosition = new Vector3(dc.transform.localPosition.x, dc.transform.localPosition.y, 0f);
         dc.Drawer.ShaderType = this.ShaderType;
@@ -224,7 +253,7 @@ public class ClickRainController : MonoBehaviour
     {
         if (dc.currentState == DrawState.Playing)
         {
-            if (GetProgress(dc) >= 1.0f)
+            if (GetProgress(dc) >= 1.0f && (Variables.ExistAllTime == false))
             {
                 dc.Drawer.Hide();
                 dc.currentState = DrawState.Disabled;

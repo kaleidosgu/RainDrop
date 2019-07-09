@@ -64,4 +64,10 @@ public class ClickRainVariables {
 
 	[Range(0.0f, 5.0f)]
 	public float Darkness;
+
+    public bool ExistAllTime;
+
+    public float TimeOfMaxSizeRainDrop;
+
+    public float GForceEffectSizeRate;
 }
