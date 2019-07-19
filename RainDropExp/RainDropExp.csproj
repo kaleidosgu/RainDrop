@@ -261,6 +261,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\RainDropEffect2\ReadMe.txt" />
+    <None Include="Assets\RainDropEffect2\Shaders\Resources\CustomBlur.shader" />
     <None Include="Assets\RainDropEffect2\Shaders\Resources\RainDistortion (Deffered).shader" />
     <None Include="Assets\RainDropEffect2\Shaders\Resources\RainDistortion (Forward).shader" />
     <None Include="Assets\RainDropEffect2\Shaders\Resources\RainDistortion (Mobile).shader" />
